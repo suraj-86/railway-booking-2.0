@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 1. User Table (Handles Authentication & Roles)
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String   // Will store the secure Bcrypt hash
+  role      Role     @default(USER)
+  bookings  Booking[]
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+// 2. Train Table (The Master Schedule)
+model Train {
+  id          String    @id @default(uuid())
+  trainNumber String    @unique
+  name        String
+  source      String
+  destination String
+  departure   DateTime
+  arrival     DateTime
+  totalSeats  Int
+  seats       Seat[]
+  bookings    Booking[]
+}
+
+// 3. Seat Table (For Visual Seat Selection)
+model Seat {
+  id         String   @id @default(uuid())
+  trainId    String
+  train      Train    @relation(fields: [trainId], references: [id], onDelete: Cascade)
+  seatNumber String   // e.g., "A1", "B12"
+  coach      String   // e.g., "S1", "B1"
+  type       SeatType 
+  isBooked   Boolean  @default(false)
+  bookingId  String?
+  booking    Booking? @relation(fields: [bookingId], references: [id])
+}
+
+enum SeatType {
+  WINDOW
+  AISLE
+  MIDDLE
+}
+
+// 4. Booking Table (Links Users, Trains, and Seats)
+model Booking {
+  id          String        @id @default(uuid())
+  pnr         String        @unique 
+  userId      String
+  user        User          @relation(fields: [userId], references: [id])
+  trainId     String
+  train       Train         @relation(fields: [trainId], references: [id])
+  seats       Seat[]
+  status      BookingStatus @default(CONFIRMED)
+  totalAmount Float
+  createdAt   DateTime      @default(now())
+}
+
+enum BookingStatus {
+  CONFIRMED
+  CANCELLED
+  WAITLISTED
+}
