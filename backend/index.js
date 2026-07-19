@@ -60,6 +60,45 @@ app.post('/api/users/register', async (req, res) => {
   }
 });
 
+// --- NEW ROUTE: User Login ---
+app.post('/api/users/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // 1. Ask Prisma to find the user by their email
+    const user = await prisma.user.findUnique({
+      where: { email: email }
+    });
+
+    // If no user is found, stop here and return an error
+    if (!user) {
+      return res.status(404).json({ error: "User not found. Please register first." });
+    }
+
+    // 2. Use bcrypt to compare the typed password against the saved scrambled password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    // If they don't match, stop here and return an error
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: "Incorrect password." });
+    }
+
+    // 3. If the email exists and the password matches, success!
+    res.json({ 
+      message: "Login successful!", 
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email
+      }
+    });
+    
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ error: "Failed to log in." });
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
