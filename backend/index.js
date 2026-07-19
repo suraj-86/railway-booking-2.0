@@ -207,6 +207,46 @@ app.get('/api/trains', async (req, res) => {
   }
 });
 
+// --- NEW ROUTE: Book a Ticket (Protected by JWT) ---
+app.post('/api/bookings', verifyToken, async (req, res) => {
+  try {
+    const { trainId, totalAmount } = req.body;
+    const userId = req.user.userId; // Extracted from the active token by our bouncer
+
+    // 1. Verify the train actually exists
+    const train = await prisma.train.findUnique({
+      where: { id: trainId }
+    });
+
+    if (!train) {
+      return res.status(404).json({ error: "Train not found." });
+    }
+
+    // 2. Generate a random 10-digit PNR string
+    const generatedPnr = Math.floor(1000000000 + Math.random() * 9000000000).toString();
+
+    // 3. Create the booking entry in the database
+    const newBooking = await prisma.booking.create({
+      data: {
+        pnr: generatedPnr,
+        userId: userId,
+        trainId: trainId,
+        totalAmount: parseFloat(totalAmount),
+        status: "CONFIRMED"
+      }
+    });
+
+    res.status(201).json({
+      message: "Ticket booked successfully!",
+      booking: newBooking
+    });
+
+  } catch (error) {
+    console.error("Booking error:", error);
+    res.status(500).json({ error: "Failed to complete the booking." });
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
