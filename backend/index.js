@@ -138,6 +138,47 @@ app.get('/api/users/profile', verifyToken, async (req, res) => {
   }
 });
 
+// --- NEW ROUTE: Admin Add Train ---
+app.post('/api/trains', verifyToken, async (req, res) => {
+  try {
+    // 1. Fetch the user to check their role
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.userId }
+    });
+
+    // 2. The Admin Check
+    if (user.role !== 'ADMIN') {
+      return res.status(403).json({ error: "Access Denied. Admins only." });
+    }
+
+    // 3. Grab train details from the request body
+    const { trainNumber, name, source, destination, departure, arrival, totalSeats } = req.body;
+
+    // 4. Ask Prisma to create the train in the database
+    const newTrain = await prisma.train.create({
+      data: {
+        trainNumber: trainNumber,
+        name: name,
+        source: source,
+        destination: destination,
+        // We wrap the dates in new Date() to format them for PostgreSQL
+        departure: new Date(departure), 
+        arrival: new Date(arrival),
+        totalSeats: totalSeats
+      }
+    });
+
+    res.status(201).json({ 
+      message: "Train added successfully!", 
+      train: newTrain 
+    });
+
+  } catch (error) {
+    console.error("Add train error:", error);
+    res.status(500).json({ error: "Failed to add train." });
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
