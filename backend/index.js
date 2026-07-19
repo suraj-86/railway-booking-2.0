@@ -4,6 +4,7 @@ import 'dotenv/config';
 import prisma from './db.js'; // <-- 1. Import the database connection
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import verifyToken from './middleware/auth.js';
 
 const app = express();
 
@@ -104,6 +105,36 @@ app.post('/api/users/login', async (req, res) => {
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ error: "Failed to log in." });
+  }
+});
+
+// --- NEW ROUTE: View Profile (Protected by JWT) ---
+app.get('/api/users/profile', verifyToken, async (req, res) => {
+  try {
+    // Because the bouncer (verifyToken) successfully passed the request, 
+    // we now have access to req.user (which contains the userId)
+    
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.userId } // We use the ID from the token!
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    // Send back the user's profile info (always hide the password!)
+    res.json({
+      message: "Welcome to your VIP profile!",
+      profile: {
+        id: user.id,
+        name: user.name,
+        email: user.email
+      }
+    });
+
+  } catch (error) {
+    console.error("Profile error:", error);
+    res.status(500).json({ error: "Failed to fetch profile." });
   }
 });
 
