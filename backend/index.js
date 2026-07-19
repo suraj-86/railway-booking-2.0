@@ -3,6 +3,7 @@ import cors from 'cors';
 import 'dotenv/config';
 import prisma from './db.js'; // <-- 1. Import the database connection
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 const app = express();
 
@@ -60,7 +61,7 @@ app.post('/api/users/register', async (req, res) => {
   }
 });
 
-// --- NEW ROUTE: User Login ---
+// --- UPDATED ROUTE: User Login (Now with JWT) ---
 app.post('/api/users/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -70,7 +71,6 @@ app.post('/api/users/login', async (req, res) => {
       where: { email: email }
     });
 
-    // If no user is found, stop here and return an error
     if (!user) {
       return res.status(404).json({ error: "User not found. Please register first." });
     }
@@ -78,14 +78,22 @@ app.post('/api/users/login', async (req, res) => {
     // 2. Use bcrypt to compare the typed password against the saved scrambled password
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
-    // If they don't match, stop here and return an error
     if (!isPasswordValid) {
       return res.status(401).json({ error: "Incorrect password." });
     }
 
-    // 3. If the email exists and the password matches, success!
+    // 3. GENERATE THE JWT "WRISTBAND"
+    // We package the user's ID inside the token so the server knows who they are later
+    const token = jwt.sign(
+      { userId: user.id }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: '24h' } // The wristband expires in 24 hours
+    );
+
+    // 4. Send back the success message, the user data, AND the new token
     res.json({ 
       message: "Login successful!", 
+      token: token,
       user: {
         id: user.id,
         name: user.name,
