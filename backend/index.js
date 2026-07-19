@@ -179,6 +179,34 @@ app.post('/api/trains', verifyToken, async (req, res) => {
   }
 });
 
+// --- UPDATED ROUTE: Search Trains (Public) ---
+app.get('/api/trains', async (req, res) => {
+  try {
+    // 1. Grab the search queries from the URL (if they exist)
+    const { source, destination } = req.query;
+
+    // 2. Build a flexible search filter
+    let filter = {};
+    if (source) filter.source = source;
+    if (destination) filter.destination = destination;
+
+    // 3. Ask Prisma to find trains that match the filter (or all trains if no filter is provided)
+    const trains = await prisma.train.findMany({
+      where: filter
+    });
+
+    res.json({
+      message: "Master schedule fetched successfully!",
+      results: trains.length,
+      trains: trains
+    });
+
+  } catch (error) {
+    console.error("Fetch trains error:", error);
+    res.status(500).json({ error: "Failed to fetch trains." });
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
