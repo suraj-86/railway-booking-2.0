@@ -1,5 +1,6 @@
 import { useState, useContext } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
 const containerVariants = {
@@ -15,6 +16,44 @@ const itemVariants = {
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
   const [searchType, setSearchType] = useState('route'); 
+  const navigate = useNavigate();
+
+  // --- 1. ROUTE SEARCH STATE ---
+  const [fromQuery, setFromQuery] = useState('');
+  const [showFromDropdown, setShowFromDropdown] = useState(false);
+  const [fromSuggestions, setFromSuggestions] = useState([]); 
+
+  const [toQuery, setToQuery] = useState('');
+  const [showToDropdown, setShowToDropdown] = useState(false);
+  const [toSuggestions, setToSuggestions] = useState([]); 
+
+  // --- 2. TRAIN SEARCH STATE ---
+  const [trainQuery, setTrainQuery] = useState('');
+  const [showTrainDropdown, setShowTrainDropdown] = useState(false);
+  const [trainSuggestions, setTrainSuggestions] = useState([]);
+
+  // --- 3. STATION SEARCH STATE ---
+  const [stationQuery, setStationQuery] = useState('');
+  const [showStationDropdown, setShowStationDropdown] = useState(false);
+  const [stationSuggestions, setStationSuggestions] = useState([]);
+
+  // --- FUTURE BACKEND API HANDLERS ---
+  const searchAPI = async (endpoint, query, setSuggestions) => {
+    if (!query) {
+      setSuggestions([]);
+      return;
+    }
+    // TODO: Uncomment when your Express backend is running!
+    /*
+    try {
+      const response = await fetch(`http://localhost:5000/api/${endpoint}?q=${query}`);
+      const data = await response.json();
+      setSuggestions(data);
+    } catch (error) {
+      console.error("API error:", error);
+    }
+    */
+  };
 
   return (
     <div className="flex justify-center items-center min-h-[85vh] py-8">
@@ -36,51 +75,169 @@ const Dashboard = () => {
 
           {/* Dynamic Search Forms */}
           <motion.div variants={itemVariants} className="grow">
+            
+            {/* ROUTE SEARCH TAB */}
             {searchType === 'route' && (
               <form className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
+                  
+                  {/* FROM STATION */}
+                  <div className="relative">
                     <label className="block text-slate-300 font-semibold tracking-wide mb-2">FROM STATION</label>
-                    <input type="text" className="w-full px-5 py-4 rounded-xl bg-heritage-900 border border-heritage-900 text-slate-100 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500" placeholder="e.g., New Delhi (NDLS)" />
+                    <input 
+                      type="text" 
+                      value={fromQuery}
+                      onChange={(e) => {
+                        setFromQuery(e.target.value);
+                        setShowFromDropdown(true);
+                        searchAPI('stations/search', e.target.value, setFromSuggestions);
+                      }}
+                      onFocus={() => setShowFromDropdown(true)}
+                      onBlur={() => setTimeout(() => setShowFromDropdown(false), 200)} 
+                      className="w-full px-5 py-4 rounded-xl bg-heritage-900 border border-heritage-900 text-slate-100 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500" 
+                      placeholder="e.g., New Delhi (NDLS)" 
+                      autoComplete="off"
+                    />
+                    <AnimatePresence>
+                      {showFromDropdown && fromQuery && (
+                        <motion.ul initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }} className="absolute z-20 w-full mt-2 bg-heritage-950 border border-heritage-800 rounded-xl shadow-2xl max-h-48 overflow-y-auto">
+                          {fromSuggestions.length > 0 ? (
+                            fromSuggestions.map((st, i) => (
+                              <li key={i} onClick={() => { setFromQuery(st); setShowFromDropdown(false); }} className="px-5 py-3 hover:bg-heritage-900 cursor-pointer text-slate-200 border-b border-heritage-900/50">{st}</li>
+                            ))
+                          ) : (
+                            <li className="px-5 py-3 text-slate-500 italic">Awaiting API connection...</li>
+                          )}
+                        </motion.ul>
+                      )}
+                    </AnimatePresence>
                   </div>
-                  <div>
+
+                  {/* TO STATION */}
+                  <div className="relative">
                     <label className="block text-slate-300 font-semibold tracking-wide mb-2">TO STATION</label>
-                    <input type="text" className="w-full px-5 py-4 rounded-xl bg-heritage-900 border border-heritage-900 text-slate-100 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500" placeholder="e.g., Mumbai Central (BCT)" />
+                    <input 
+                      type="text" 
+                      value={toQuery}
+                      onChange={(e) => {
+                        setToQuery(e.target.value);
+                        setShowToDropdown(true);
+                        searchAPI('stations/search', e.target.value, setToSuggestions);
+                      }}
+                      onFocus={() => setShowToDropdown(true)}
+                      onBlur={() => setTimeout(() => setShowToDropdown(false), 200)}
+                      className="w-full px-5 py-4 rounded-xl bg-heritage-900 border border-heritage-900 text-slate-100 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500" 
+                      placeholder="e.g., Mumbai Central (BCT)" 
+                      autoComplete="off"
+                    />
+                    <AnimatePresence>
+                      {showToDropdown && toQuery && (
+                        <motion.ul initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }} className="absolute z-20 w-full mt-2 bg-heritage-950 border border-heritage-800 rounded-xl shadow-2xl max-h-48 overflow-y-auto">
+                          {toSuggestions.length > 0 ? (
+                            toSuggestions.map((st, i) => (
+                              <li key={i} onClick={() => { setToQuery(st); setShowToDropdown(false); }} className="px-5 py-3 hover:bg-heritage-900 cursor-pointer text-slate-200 border-b border-heritage-900/50">{st}</li>
+                            ))
+                          ) : (
+                            <li className="px-5 py-3 text-slate-500 italic">Awaiting API connection...</li>
+                          )}
+                        </motion.ul>
+                      )}
+                    </AnimatePresence>
                   </div>
+
                 </div>
+
                 <div>
                   <label className="block text-slate-300 font-semibold tracking-wide mb-2">JOURNEY DATE</label>
                   <input type="date" className="w-full px-5 py-4 rounded-xl bg-heritage-900 border border-heritage-900 text-slate-100 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 [&::-webkit-calendar-picker-indicator]:invert" />
                 </div>
-                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full py-4 rounded-xl bg-orange-600 text-slate-100 font-brand text-2xl tracking-widest shadow-lg shadow-orange-950/40 hover:shadow-orange-950/70 transition-shadow duration-300 mt-4">
+                
+                <motion.button type="button" onClick={() => navigate('/results')} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full py-4 rounded-xl bg-orange-600 text-slate-100 font-brand text-2xl tracking-widest shadow-lg shadow-orange-950/40 hover:shadow-orange-950/70 transition-shadow duration-300 mt-4">
                   SEARCH TRAINS
                 </motion.button>
               </form>
             )}
 
+            {/* TRAIN SEARCH TAB */}
             {searchType === 'train' && (
               <form className="space-y-6">
-                <div>
+                <div className="relative">
                   <label className="block text-slate-300 font-semibold tracking-wide mb-2">TRAIN NAME OR NUMBER</label>
-                  <input type="text" className="w-full px-5 py-4 rounded-xl bg-heritage-900 border border-heritage-900 text-slate-100 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500" placeholder="e.g., 12951 or Rajdhani Express" />
+                  <input 
+                    type="text" 
+                    value={trainQuery}
+                    onChange={(e) => {
+                      setTrainQuery(e.target.value);
+                      setShowTrainDropdown(true);
+                      searchAPI('trains/search', e.target.value, setTrainSuggestions);
+                    }}
+                    onFocus={() => setShowTrainDropdown(true)}
+                    onBlur={() => setTimeout(() => setShowTrainDropdown(false), 200)}
+                    className="w-full px-5 py-4 rounded-xl bg-heritage-900 border border-heritage-900 text-slate-100 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500" 
+                    placeholder="e.g., 12951 or Rajdhani Express" 
+                    autoComplete="off"
+                  />
+                  <AnimatePresence>
+                    {showTrainDropdown && trainQuery && (
+                      <motion.ul initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }} className="absolute z-20 w-full mt-2 bg-heritage-950 border border-heritage-800 rounded-xl shadow-2xl max-h-48 overflow-y-auto">
+                        {trainSuggestions.length > 0 ? (
+                          trainSuggestions.map((tr, i) => (
+                            <li key={i} onClick={() => { setTrainQuery(tr); setShowTrainDropdown(false); }} className="px-5 py-3 hover:bg-heritage-900 cursor-pointer text-slate-200 border-b border-heritage-900/50">{tr}</li>
+                          ))
+                        ) : (
+                          <li className="px-5 py-3 text-slate-500 italic">Awaiting API connection...</li>
+                        )}
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
                 </div>
-                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full py-4 rounded-xl bg-orange-600 text-slate-100 font-brand text-2xl tracking-widest shadow-lg shadow-orange-950/40 hover:shadow-orange-950/70 transition-shadow mt-4">
+
+                <motion.button type="button" onClick={() => navigate('/train-status')} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full py-4 rounded-xl bg-orange-600 text-slate-100 font-brand text-2xl tracking-widest shadow-lg shadow-orange-950/40 hover:shadow-orange-950/70 transition-shadow mt-4">
                   LOCATE TRAIN
                 </motion.button>
               </form>
             )}
 
+            {/* STATION SEARCH TAB */}
             {searchType === 'station' && (
               <form className="space-y-6">
-                <div>
+                <div className="relative">
                   <label className="block text-slate-300 font-semibold tracking-wide mb-2">STATION CODE / NAME</label>
-                  <input type="text" className="w-full px-5 py-4 rounded-xl bg-heritage-900 border border-heritage-900 text-slate-100 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500" placeholder="e.g., NDLS" />
+                  <input 
+                    type="text" 
+                    value={stationQuery}
+                    onChange={(e) => {
+                      setStationQuery(e.target.value);
+                      setShowStationDropdown(true);
+                      searchAPI('stations/search', e.target.value, setStationSuggestions);
+                    }}
+                    onFocus={() => setShowStationDropdown(true)}
+                    onBlur={() => setTimeout(() => setShowStationDropdown(false), 200)}
+                    className="w-full px-5 py-4 rounded-xl bg-heritage-900 border border-heritage-900 text-slate-100 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500" 
+                    placeholder="e.g., NDLS" 
+                    autoComplete="off"
+                  />
+                  <AnimatePresence>
+                    {showStationDropdown && stationQuery && (
+                      <motion.ul initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }} className="absolute z-20 w-full mt-2 bg-heritage-950 border border-heritage-800 rounded-xl shadow-2xl max-h-48 overflow-y-auto">
+                        {stationSuggestions.length > 0 ? (
+                          stationSuggestions.map((st, i) => (
+                            <li key={i} onClick={() => { setStationQuery(st); setShowStationDropdown(false); }} className="px-5 py-3 hover:bg-heritage-900 cursor-pointer text-slate-200 border-b border-heritage-900/50">{st}</li>
+                          ))
+                        ) : (
+                          <li className="px-5 py-3 text-slate-500 italic">Awaiting API connection...</li>
+                        )}
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
                 </div>
-                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full py-4 rounded-xl bg-orange-600 text-slate-100 font-brand text-2xl tracking-widest shadow-lg shadow-orange-950/40 hover:shadow-orange-950/70 transition-shadow mt-4">
+
+                <motion.button type="button" onClick={() => navigate('/station-board')} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full py-4 rounded-xl bg-orange-600 text-slate-100 font-brand text-2xl tracking-widest shadow-lg shadow-orange-950/40 hover:shadow-orange-950/70 transition-shadow mt-4">
                   VIEW STATION BOARD
                 </motion.button>
               </form>
             )}
+
           </motion.div>
 
           {/* Search History */}
