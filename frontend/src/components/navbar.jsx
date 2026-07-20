@@ -4,12 +4,12 @@ import { motion } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
 
 const Navbar = () => {
-  const { user, logout } = useContext(AuthContext); 
+  const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
-    navigate('/login'); 
+    navigate('/');
   };
 
   return (
@@ -21,33 +21,32 @@ const Navbar = () => {
     >
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         
-        {/* Modern Clean Logo */}
-        <Link to="/" className="text-3xl font-brand tracking-tight text-transparent bg-clip-text bg-gradient-orange-text uppercase">
-          RAILWAY 2.0
+        {/* Minimalist Logo */}
+        <Link to={user ? "/dashboard" : "/"} className="text-3xl font-brand tracking-tight text-transparent bg-clip-text bg-gradient-orange-text uppercase">
+          REAL RAIL
         </Link>
 
-        {/* Navigation Links */}
-        <div className="flex space-x-6 items-center font-tech text-xl">
+        {/* Dynamic Navigation */}
+        <div className="flex items-center font-tech text-xl">
           {user ? (
-            <>
-              <span className="text-slate-300 font-semibold tracking-wide">
+            <div className="flex items-center space-x-6">
+              <Link to="/profile" className="text-slate-300 font-semibold tracking-wide hover:text-orange-500 transition-colors duration-300">
                 WELCOME, <span className="text-orange-500">{user.name.toUpperCase()}</span>
-              </span>
+              </Link>
               <motion.button 
                 onClick={handleLogout}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-6 py-2 rounded-lg border-2 border-heritage-900 text-slate-300 font-bold tracking-wider hover:bg-heritage-900 transition-colors duration-300"
+                className="px-4 py-1.5 rounded-lg border border-heritage-900 text-slate-400 text-sm font-bold tracking-wider hover:bg-heritage-900 hover:text-slate-100 transition-colors duration-300"
               >
                 LOGOUT
               </motion.button>
-            </>
+            </div>
           ) : (
-            <>
-              <Link to="/login" className="text-slate-300 hover:text-slate-100 transition-colors duration-300 font-semibold tracking-wide">
+            <div className="flex space-x-6">
+              <Link to="/login" className="text-slate-300 hover:text-slate-100 transition-colors duration-300 font-semibold tracking-wide flex items-center">
                 LOGIN
               </Link>
-              
               <Link to="/register">
                 <motion.button 
                   whileHover={{ scale: 1.05 }}
@@ -57,10 +56,9 @@ const Navbar = () => {
                   SIGN UP
                 </motion.button>
               </Link>
-            </>
+            </div>
           )}
         </div>
-
       </div>
     </motion.nav>
   );

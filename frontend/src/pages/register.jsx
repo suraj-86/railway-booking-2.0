@@ -35,7 +35,7 @@ const Register = () => {
     const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
     
     login(mockUserData, mockToken); 
-    navigate('/'); 
+    navigate('/dashboard'); 
   };
 
   return (
@@ -87,13 +87,13 @@ const Register = () => {
 
             <motion.div variants={itemVariants} className="pt-4">
               <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} type="submit" className="w-full py-4 rounded-xl bg-orange-600 text-slate-100 font-brand text-2xl tracking-widest shadow-lg shadow-orange-950/40 hover:shadow-orange-950/70 transition-shadow duration-300">
-                JOIN THE NETWORK
+                JOIN THE REAL RAIL
               </motion.button>
             </motion.div>
           </form>
 
           <motion.div variants={itemVariants} className="mt-8 border-t border-heritage-900 pt-6 text-center text-slate-300">
-            Already have an account? <Link to="/login" className="text-orange-500 hover:text-orange-400 transition-colors font-bold tracking-wide">AUTHENTICATE HERE</Link>
+            Already have an account? <Link to="/login" className="text-orange-500 hover:text-orange-400 transition-colors font-bold tracking-wide">LOGIN HERE</Link>
           </motion.div>
         </motion.div>
 

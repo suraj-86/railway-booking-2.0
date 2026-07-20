@@ -34,7 +34,7 @@ const Login = () => {
     const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
     
     login(mockUserData, mockToken); 
-    navigate('/'); 
+    navigate('/dashboard'); 
   };
 
   return (
@@ -65,7 +65,7 @@ const Login = () => {
         {/* RIGHT PANEL (FORM) */}
         <motion.div variants={containerVariants} initial="hidden" animate="visible" className="md:col-span-7 bg-heritage-950 p-12 lg:p-20 flex flex-col justify-center font-tech text-lg">
           <motion.h2 variants={itemVariants} className="text-4xl font-brand tracking-wide mb-6 text-slate-100 uppercase">
-            ACCESS <span className="text-orange-500">STATION</span>
+            ACCESS <span className="text-orange-500">YOUR ID</span>
           </motion.h2>
 
           <AnimatePresence>
