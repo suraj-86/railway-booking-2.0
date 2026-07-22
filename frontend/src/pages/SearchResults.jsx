@@ -93,8 +93,8 @@ const SearchResults = () => {
                 </div>
                 <div className="flex flex-col items-center">
                   <div className="text-xs text-slate-500">{train.duration}</div>
-                  <div className="w-16 h-[1px] bg-heritage-800 my-1 relative">
-                    <div className="absolute w-2 h-2 bg-orange-600 rounded-full -top-[3px] left-1/2 -translate-x-1/2"></div>
+                  <div className="w-16 h-px bg-heritage-800 my-1 relative">
+                    <div className="absolute w-2 h-2 bg-orange-600 rounded-full -top-0.75 left-1/2 -translate-x-1/2"></div>
                   </div>
                 </div>
                 <div className="text-center">
@@ -110,7 +110,7 @@ const SearchResults = () => {
                 <div 
                   key={index} 
                   onClick={() => cls.available && navigate('/book')}
-                  className={`flex-1 min-w-[150px] p-4 rounded-xl border ${cls.available ? 'border-heritage-800 bg-heritage-950 hover:border-orange-500 cursor-pointer' : 'border-heritage-900 bg-heritage-900/30 opacity-50 cursor-not-allowed'} transition-colors`}
+                  className={`flex-1 min-w-37.5 p-4 rounded-xl border ${cls.available ? 'border-heritage-800 bg-heritage-950 hover:border-orange-500 cursor-pointer' : 'border-heritage-900 bg-heritage-900/30 opacity-50 cursor-not-allowed'} transition-colors`}
                 >
                   <div className="flex justify-between items-center mb-2">
                     <span className="font-bold text-slate-200">{cls.type}</span>
