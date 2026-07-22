@@ -74,7 +74,7 @@ const Dashboard = () => {
           </motion.div>
 
           {/* Dynamic Search Forms */}
-          <motion.div variants={itemVariants} className="grow">
+          <motion.div variants={itemVariants} className="flex-grow">
             
             {/* ROUTE SEARCH TAB */}
             {searchType === 'route' && (
@@ -263,25 +263,26 @@ const Dashboard = () => {
             <p className="text-slate-400 font-tech mt-2">Ready for your next departure?</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 grow content-start font-tech">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-grow content-start font-tech">
             <motion.div whileHover={{ scale: 1.05 }} onClick={() => setSearchType('route')} className="bg-heritage-950 p-6 rounded-xl border border-heritage-800 hover:border-orange-500 transition-colors cursor-pointer flex flex-col items-center justify-center text-center shadow-lg">
               <span className="text-3xl mb-2">🎫</span>
               <span className="text-slate-200 font-bold tracking-wide text-sm">BOOK TICKET</span>
             </motion.div>
             
-            <motion.div whileHover={{ scale: 1.05 }} className="bg-heritage-950 p-6 rounded-xl border border-heritage-800 hover:border-orange-500 transition-colors cursor-pointer flex flex-col items-center justify-center text-center shadow-lg">
+            <motion.div whileHover={{ scale: 1.05 }} onClick={() => navigate('/bookings')} className="bg-heritage-950 p-6 rounded-xl border border-heritage-800 hover:border-orange-500 transition-colors cursor-pointer flex flex-col items-center justify-center text-center shadow-lg">
               <span className="text-3xl mb-2">📋</span>
               <span className="text-slate-200 font-bold tracking-wide text-sm">MY BOOKINGS</span>
             </motion.div>
             
-            <motion.div whileHover={{ scale: 1.05 }} className="bg-heritage-950 p-6 rounded-xl border border-heritage-800 hover:border-orange-500 transition-colors cursor-pointer flex flex-col items-center justify-center text-center shadow-lg">
+            <motion.div whileHover={{ scale: 1.05 }} onClick={() => navigate('/pnr')} className="bg-heritage-950 p-6 rounded-xl border border-heritage-800 hover:border-orange-500 transition-colors cursor-pointer flex flex-col items-center justify-center text-center shadow-lg">
               <span className="text-3xl mb-2">🔍</span>
               <span className="text-slate-200 font-bold tracking-wide text-sm">PNR ENQUIRY</span>
             </motion.div>
             
-            <motion.div whileHover={{ scale: 1.05 }} className="bg-heritage-950 p-6 rounded-xl border border-heritage-800 hover:border-red-500 transition-colors cursor-pointer flex flex-col items-center justify-center text-center shadow-lg">
-              <span className="text-3xl mb-2">❌</span>
-              <span className="text-slate-200 font-bold tracking-wide text-sm">CANCEL TICKET</span>
+            {/* UPDATED: MY PROFILE BUTTON */}
+            <motion.div whileHover={{ scale: 1.05 }} onClick={() => navigate('/profile')} className="bg-heritage-950 p-6 rounded-xl border border-heritage-800 hover:border-orange-500 transition-colors cursor-pointer flex flex-col items-center justify-center text-center shadow-lg">
+              <span className="text-3xl mb-2">🪪</span>
+              <span className="text-slate-200 font-bold tracking-wide text-sm">MY PROFILE</span>
             </motion.div>
           </div>
         </div>

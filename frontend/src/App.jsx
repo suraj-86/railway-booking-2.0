@@ -7,7 +7,12 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import SearchResults from './pages/SearchResults';
 import Booking from './pages/Booking';
-import Confirmation from './pages/Confirmation'; // <-- Import the final page
+import Confirmation from './pages/Confirmation';
+import TrainStatus from './pages/TrainStatus';
+import StationBoard from './pages/StationBoard';
+import Profile from './pages/Profile'; // <-- Import
+import MyBookings from './pages/MyBookings'; // <-- Import
+import PnrEnquiry from './pages/PnrEnquiry'; // <-- Import
 
 function App() {
   return (
@@ -24,7 +29,14 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} /> 
               <Route path="/results" element={<SearchResults />} /> 
               <Route path="/book" element={<Booking />} />
-              <Route path="/confirmation" element={<Confirmation />} /> {/* <-- Add the route */}
+              <Route path="/confirmation" element={<Confirmation />} />
+              <Route path="/train-status" element={<TrainStatus />} /> 
+              <Route path="/station-board" element={<StationBoard />} />
+              
+              {/* The Final Utility Routes */}
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/bookings" element={<MyBookings />} />
+              <Route path="/pnr" element={<PnrEnquiry />} />
             </Routes>
           </main>
         </div>
