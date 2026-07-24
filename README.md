@@ -15,7 +15,7 @@ A modern, full-stack railway ticket reservation and management web application b
 
 To log in and test the **Admin Dashboard** (managing trains, stations, schedules, and pricing):
 * **Admin Email:** `admin@test.com` *(or create an admin account directly in your database/register)*
-* **Password:** 'password123'
+* **Password:** `password123`
 
 ---
 
