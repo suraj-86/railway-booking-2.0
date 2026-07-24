@@ -1,10 +1,10 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext.jsx';
-import Navbar from './components/Navbar.jsx';
-import Home from './pages/Home.jsx';
-import Login from './pages/Login.jsx';
-import Register from './pages/Register.jsx';
-import Dashboard from './pages/Dashboard.jsx';
+import Navbar from './components/navbar.jsx';
+import Home from './pages/home.jsx';
+import Login from './pages/login.jsx';
+import Register from './pages/register.jsx';
+import Dashboard from './pages/dashboard.jsx';
 import SearchResults from './pages/SearchResults.jsx';
 import Booking from './pages/Booking.jsx';
 import Confirmation from './pages/Confirmation.jsx';
