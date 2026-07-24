@@ -1,8 +1,8 @@
 import { useState, useEffect, useContext } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
-import { API_BASE_URL } from '../config/api';
+import { AuthContext } from '../context/AuthContext.jsx';
+import { API_BASE_URL } from '../config/api.js';
 
 const MAX_SEATS = 6;
 

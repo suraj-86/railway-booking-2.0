@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL } from '../config/api.js';
 
 const PnrEnquiry = () => {
   const [pnr, setPnr] = useState('');
@@ -47,7 +47,7 @@ const PnrEnquiry = () => {
             />
           </div>
           <div className="flex items-end">
-            <button type="submit" disabled={pnr.length !== 10 || isSearching} className="w-full md:w-auto px-10 py-4 rounded-xl bg-orange-600 text-slate-100 font-bold hover:bg-orange-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed tracking-widest h-[62px]">
+            <button type="submit" disabled={pnr.length !== 10 || isSearching} className="w-full md:w-auto px-10 py-4 rounded-xl bg-orange-600 text-slate-100 font-bold hover:bg-orange-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed tracking-widest h-15.5">
               {isSearching ? 'SCANNING DB...' : 'GET STATUS'}
             </button>
           </div>

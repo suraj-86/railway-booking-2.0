@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
-import { AuthContext } from '../../context/AuthContext';
-import StationsPanel from './panels/StationsPanel';
-import TrainsPanel from './panels/TrainsPanel';
+import { AuthContext } from '../../context/AuthContext.jsx';
+import StationsPanel from './panels/StationsPanel.jsx';
+import TrainsPanel from './panels/TrainsPanel.jsx';
 
 const TABS = [
   { id: 'trains', label: 'Trains', icon: '🚆' },

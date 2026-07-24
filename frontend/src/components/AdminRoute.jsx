@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { Navigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../context/AuthContext.jsx';
 
 // Wrap any admin-only page in this: <AdminRoute><AddTrain /></AdminRoute>
 // - Not logged in at all -> bounce to /login

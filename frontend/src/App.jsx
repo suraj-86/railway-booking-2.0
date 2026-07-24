@@ -1,20 +1,20 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import Navbar from './components/Navbar';
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
-import SearchResults from './pages/SearchResults';
-import Booking from './pages/Booking';
-import Confirmation from './pages/Confirmation';
-import TrainStatus from './pages/TrainStatus';
-import StationBoard from './pages/StationBoard';
-import Profile from './pages/Profile';
-import MyBookings from './pages/MyBookings';
-import PnrEnquiry from './pages/PnrEnquiry';
-import AdminRoute from './components/AdminRoute';
-import AdminDashboard from './pages/Admin/AdminDashboard';
+import { AuthProvider } from './context/AuthContext.jsx';
+import Navbar from './components/Navbar.jsx';
+import Home from './pages/Home.jsx';
+import Login from './pages/Login.jsx';
+import Register from './pages/Register.jsx';
+import Dashboard from './pages/Dashboard.jsx';
+import SearchResults from './pages/SearchResults.jsx';
+import Booking from './pages/Booking.jsx';
+import Confirmation from './pages/Confirmation.jsx';
+import TrainStatus from './pages/TrainStatus.jsx';
+import StationBoard from './pages/StationBoard.jsx';
+import Profile from './pages/Profile.jsx';
+import MyBookings from './pages/MyBookings.jsx';
+import PnrEnquiry from './pages/PnrEnquiry.jsx';
+import AdminRoute from './components/AdminRoute.jsx';
+import AdminDashboard from './pages/Admin/AdminDashboard.jsx';
 
 function App() {
   return (

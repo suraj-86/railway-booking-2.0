@@ -1,8 +1,8 @@
 import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AuthContext } from '../context/AuthContext'; 
-import { API_BASE_URL } from '../config/api';
+import { AuthContext } from '../context/AuthContext.jsx'; 
+import { API_BASE_URL } from '../config/api.js';
 
 const containerVariants = {
   hidden: { opacity: 0 },

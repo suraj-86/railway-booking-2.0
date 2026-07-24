@@ -1,8 +1,8 @@
 import { useState, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
-import { API_BASE_URL } from '../config/api';
+import { AuthContext } from '../context/AuthContext.jsx';
+import { API_BASE_URL } from '../config/api.js';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -107,7 +107,7 @@ const Dashboard = () => {
           </motion.div>
 
           {/* Dynamic Search Forms */}
-          <motion.div variants={itemVariants} className="flex-grow">
+          <motion.div variants={itemVariants} className="grow">
             
             {/* ROUTE SEARCH TAB */}
             {searchType === 'route' && (
@@ -300,7 +300,7 @@ const Dashboard = () => {
             <p className="text-slate-400 font-tech mt-2">Ready for your next departure?</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-grow content-start font-tech">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 grow content-start font-tech">
             <motion.div whileHover={{ scale: 1.05 }} onClick={() => setSearchType('route')} className="bg-heritage-950 p-6 rounded-xl border border-heritage-800 hover:border-orange-500 transition-colors cursor-pointer flex flex-col items-center justify-center text-center shadow-lg">
               <span className="text-3xl mb-2">🎫</span>
               <span className="text-slate-200 font-bold tracking-wide text-sm">BOOK TICKET</span>

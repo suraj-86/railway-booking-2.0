@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { AuthContext } from '../context/AuthContext';
-import { API_BASE_URL } from '../config/api';
+import { AuthContext } from '../context/AuthContext.jsx';
+import { API_BASE_URL } from '../config/api.js';
 
 const Profile = () => {
   const { user, token, login } = useContext(AuthContext); // Destructure login to update context
@@ -77,7 +77,7 @@ const Profile = () => {
         
         {/* Profile Card */}
         <div className="bg-heritage-900 border border-heritage-800 rounded-3xl p-8 shadow-2xl text-center relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-orange-500 to-orange-600"></div>
+          <div className="absolute top-0 left-0 w-full h-2 bg-linear-to-r from-orange-500 to-orange-600"></div>
           
           <div className="flex justify-end mb-2">
             {isEditing ? (
@@ -146,7 +146,7 @@ const Profile = () => {
 
       {/* Right Column: Placeholder for future features */}
       <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="w-full md:w-2/3 flex flex-col gap-6">
-        <div className="bg-heritage-900 border border-heritage-800 rounded-3xl p-8 shadow-2xl flex-grow">
+        <div className="bg-heritage-900 border border-heritage-800 rounded-3xl p-8 shadow-2xl grow">
           <h3 className="text-xl font-brand text-slate-100 tracking-wide border-b border-heritage-800 pb-4 mb-6">SAVED PASSENGERS</h3>
           <p className="text-slate-500 text-sm italic">No saved passengers found in database. Feature coming soon.</p>
         </div>
