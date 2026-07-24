@@ -13,6 +13,8 @@ import StationBoard from './pages/StationBoard';
 import Profile from './pages/Profile'; // <-- Import
 import MyBookings from './pages/MyBookings'; // <-- Import
 import PnrEnquiry from './pages/PnrEnquiry'; // <-- Import
+import AdminRoute from './components/AdminRoute';
+import AdminDashboard from './pages/admin/AdminDashboard';
 
 function App() {
   return (
@@ -37,6 +39,9 @@ function App() {
               <Route path="/profile" element={<Profile />} />
               <Route path="/bookings" element={<MyBookings />} />
               <Route path="/pnr" element={<PnrEnquiry />} />
+
+              {/* Admin-only route — a single dashboard with tabs for Trains / Stations */}
+              <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
             </Routes>
           </main>
         </div>

@@ -22,21 +22,36 @@ enum Role {
   ADMIN
 }
 
-// 2. Train Table (The Master Schedule)
-model Train {
-  id          String    @id @default(uuid())
-  trainNumber String    @unique
-  name        String
-  source      String
-  destination String
-  departure   DateTime
-  arrival     DateTime
-  totalSeats  Int
-  seats       Seat[]
-  bookings    Booking[]
+// 2. Station Table (Master list of stations, managed by admins)
+model Station {
+  id        String   @id @default(uuid())
+  code      String   @unique // e.g. "NDLS"
+  name      String           // e.g. "New Delhi"
+  city      String
+  createdAt DateTime @default(now())
+
+  trainsFrom Train[] @relation("SourceStation")
+  trainsTo   Train[] @relation("DestinationStation")
 }
 
-// 3. Seat Table (For Visual Seat Selection)
+// 3. Train Table (The Master Schedule)
+model Train {
+  id            String    @id @default(uuid())
+  trainNumber   String    @unique
+  name          String
+  sourceId      String
+  source        Station   @relation("SourceStation", fields: [sourceId], references: [id])
+  destinationId String
+  destination   Station   @relation("DestinationStation", fields: [destinationId], references: [id])
+  departure     DateTime
+  arrival       DateTime
+  totalSeats    Int
+  price         Int      @default(500) // <-- ADD THIS LINE
+  seats         Seat[]
+  bookings      Booking[]
+}
+
+// 4. Seat Table (For Visual Seat Selection)
 model Seat {
   id         String   @id @default(uuid())
   trainId    String
@@ -55,7 +70,7 @@ enum SeatType {
   MIDDLE
 }
 
-// 4. Booking Table (Links Users, Trains, and Seats)
+// 5. Booking Table (Links Users, Trains, and Seats)
 model Booking {
   id          String        @id @default(uuid())
   pnr         String        @unique 

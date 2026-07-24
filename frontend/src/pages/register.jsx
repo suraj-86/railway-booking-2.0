@@ -2,6 +2,7 @@ import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
+import { API_BASE_URL } from '../config/api';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -18,24 +19,62 @@ const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { login } = useContext(AuthContext); 
   const navigate = useNavigate(); 
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    
+
     if (password.length < 6) {
       setError('Password must be at least 6 characters long for secure departure.');
       return;
     }
 
     setError('');
-    const mockUserData = { id: 2, name: name, email: email };
-    const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
-    
-    login(mockUserData, mockToken); 
-    navigate('/dashboard'); 
+    setIsSubmitting(true);
+
+    try {
+      // Step 1: register the account
+      const registerResponse = await fetch(`${API_BASE_URL}/api/users/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      });
+
+      const registerData = await registerResponse.json();
+
+      if (!registerResponse.ok) {
+        setError(registerData.error || 'Registration failed. Please try again.');
+        return;
+      }
+
+      // Step 2: the register route doesn't return a token, so log in right
+      // after registering to get one and land the user in a signed-in state.
+      const loginResponse = await fetch(`${API_BASE_URL}/api/users/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const loginData = await loginResponse.json();
+
+      if (!loginResponse.ok) {
+        // Registration succeeded but auto-login failed — send them to log in manually.
+        navigate('/login');
+        return;
+      }
+
+      login(loginData.user, loginData.token);
+      navigate('/dashboard');
+
+    } catch (err) {
+      console.error('Registration request failed:', err);
+      setError('Could not reach the server. Is the backend running?');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -86,8 +125,8 @@ const Register = () => {
             </motion.div>
 
             <motion.div variants={itemVariants} className="pt-4">
-              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} type="submit" className="w-full py-4 rounded-xl bg-orange-600 text-slate-100 font-brand text-2xl tracking-widest shadow-lg shadow-orange-950/40 hover:shadow-orange-950/70 transition-shadow duration-300">
-                JOIN THE REAL RAIL
+              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} type="submit" disabled={isSubmitting} className="w-full py-4 rounded-xl bg-orange-600 text-slate-100 font-brand text-2xl tracking-widest shadow-lg shadow-orange-950/40 hover:shadow-orange-950/70 transition-shadow duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                {isSubmitting ? 'CREATING...' : 'JOIN THE REAL RAIL'}
               </motion.button>
             </motion.div>
           </form>

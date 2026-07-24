@@ -28,4 +28,26 @@ const verifyToken = (req, res, next) => {
   }
 };
 
+// Use AFTER verifyToken on any route that should be admin-only.
+// Needs a Prisma client passed in so it can look up the user's role.
+const requireAdmin = (prisma) => async (req, res, next) => {
+  try {
+    const user = await prisma.user.findUnique({ where: { id: req.user.userId } });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    if (user.role !== 'ADMIN') {
+      return res.status(403).json({ error: "Access Denied. Admins only." });
+    }
+
+    next();
+  } catch (error) {
+    console.error("Admin check error:", error);
+    res.status(500).json({ error: "Failed to verify admin status." });
+  }
+};
+
 export default verifyToken;
+export { requireAdmin };

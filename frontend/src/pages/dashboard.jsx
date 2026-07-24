@@ -2,6 +2,7 @@ import { useState, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { API_BASE_URL } from '../config/api';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -20,39 +21,71 @@ const Dashboard = () => {
 
   // --- 1. ROUTE SEARCH STATE ---
   const [fromQuery, setFromQuery] = useState('');
+  const [fromCode, setFromCode] = useState(''); // the actual station code we'll search with
   const [showFromDropdown, setShowFromDropdown] = useState(false);
   const [fromSuggestions, setFromSuggestions] = useState([]); 
 
   const [toQuery, setToQuery] = useState('');
+  const [toCode, setToCode] = useState('');
   const [showToDropdown, setShowToDropdown] = useState(false);
   const [toSuggestions, setToSuggestions] = useState([]); 
 
+  const [journeyDate, setJourneyDate] = useState('');
+
   // --- 2. TRAIN SEARCH STATE ---
   const [trainQuery, setTrainQuery] = useState('');
+  const [trainNumberSelected, setTrainNumberSelected] = useState('');
   const [showTrainDropdown, setShowTrainDropdown] = useState(false);
   const [trainSuggestions, setTrainSuggestions] = useState([]);
 
   // --- 3. STATION SEARCH STATE ---
   const [stationQuery, setStationQuery] = useState('');
+  const [stationCodeSelected, setStationCodeSelected] = useState('');
   const [showStationDropdown, setShowStationDropdown] = useState(false);
   const [stationSuggestions, setStationSuggestions] = useState([]);
 
-  // --- FUTURE BACKEND API HANDLERS ---
-  const searchAPI = async (endpoint, query, setSuggestions) => {
+  // --- REAL BACKEND API HANDLERS ---
+  // type is 'stations' or 'trains' — both endpoints accept a `q` query param
+  const searchAPI = async (type, query, setSuggestions) => {
     if (!query) {
       setSuggestions([]);
       return;
     }
-    // TODO: Uncomment when your Express backend is running!
-    /*
     try {
-      const response = await fetch(`http://localhost:5000/api/${endpoint}?q=${query}`);
+      const response = await fetch(`${API_BASE_URL}/api/${type}?q=${encodeURIComponent(query)}`);
       const data = await response.json();
-      setSuggestions(data);
+      if (response.ok) {
+        setSuggestions(type === 'stations' ? data.stations : data.trains);
+      } else {
+        setSuggestions([]);
+      }
     } catch (error) {
       console.error("API error:", error);
+      setSuggestions([]);
     }
-    */
+  };
+
+  const handleRouteSearch = () => {
+    const source = fromCode || fromQuery;
+    const destination = toCode || toQuery;
+
+    if (!source || !destination) return; // nothing to search yet
+
+    const params = new URLSearchParams({ source, destination });
+    if (journeyDate) params.set('date', journeyDate);
+    navigate(`/results?${params.toString()}`);
+  };
+
+  const handleTrainLocate = () => {
+    const number = trainNumberSelected || trainQuery;
+    if (!number) return;
+    navigate(`/train-status?number=${encodeURIComponent(number)}`);
+  };
+
+  const handleStationView = () => {
+    const code = stationCodeSelected || stationQuery;
+    if (!code) return;
+    navigate(`/station-board?code=${encodeURIComponent(code)}`);
   };
 
   return (
@@ -89,8 +122,9 @@ const Dashboard = () => {
                       value={fromQuery}
                       onChange={(e) => {
                         setFromQuery(e.target.value);
+                        setFromCode('');
                         setShowFromDropdown(true);
-                        searchAPI('stations/search', e.target.value, setFromSuggestions);
+                        searchAPI('stations', e.target.value, setFromSuggestions);
                       }}
                       onFocus={() => setShowFromDropdown(true)}
                       onBlur={() => setTimeout(() => setShowFromDropdown(false), 200)} 
@@ -102,11 +136,11 @@ const Dashboard = () => {
                       {showFromDropdown && fromQuery && (
                         <motion.ul initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }} className="absolute z-20 w-full mt-2 bg-heritage-950 border border-heritage-800 rounded-xl shadow-2xl max-h-48 overflow-y-auto">
                           {fromSuggestions.length > 0 ? (
-                            fromSuggestions.map((st, i) => (
-                              <li key={i} onClick={() => { setFromQuery(st); setShowFromDropdown(false); }} className="px-5 py-3 hover:bg-heritage-900 cursor-pointer text-slate-200 border-b border-heritage-900/50">{st}</li>
+                            fromSuggestions.map((st) => (
+                              <li key={st.id} onClick={() => { setFromQuery(`${st.name} (${st.code})`); setFromCode(st.code); setShowFromDropdown(false); }} className="px-5 py-3 hover:bg-heritage-900 cursor-pointer text-slate-200 border-b border-heritage-900/50">{st.name} ({st.code})</li>
                             ))
                           ) : (
-                            <li className="px-5 py-3 text-slate-500 italic">Awaiting API connection...</li>
+                            <li className="px-5 py-3 text-slate-500 italic">No stations found</li>
                           )}
                         </motion.ul>
                       )}
@@ -121,8 +155,9 @@ const Dashboard = () => {
                       value={toQuery}
                       onChange={(e) => {
                         setToQuery(e.target.value);
+                        setToCode('');
                         setShowToDropdown(true);
-                        searchAPI('stations/search', e.target.value, setToSuggestions);
+                        searchAPI('stations', e.target.value, setToSuggestions);
                       }}
                       onFocus={() => setShowToDropdown(true)}
                       onBlur={() => setTimeout(() => setShowToDropdown(false), 200)}
@@ -134,11 +169,11 @@ const Dashboard = () => {
                       {showToDropdown && toQuery && (
                         <motion.ul initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }} className="absolute z-20 w-full mt-2 bg-heritage-950 border border-heritage-800 rounded-xl shadow-2xl max-h-48 overflow-y-auto">
                           {toSuggestions.length > 0 ? (
-                            toSuggestions.map((st, i) => (
-                              <li key={i} onClick={() => { setToQuery(st); setShowToDropdown(false); }} className="px-5 py-3 hover:bg-heritage-900 cursor-pointer text-slate-200 border-b border-heritage-900/50">{st}</li>
+                            toSuggestions.map((st) => (
+                              <li key={st.id} onClick={() => { setToQuery(`${st.name} (${st.code})`); setToCode(st.code); setShowToDropdown(false); }} className="px-5 py-3 hover:bg-heritage-900 cursor-pointer text-slate-200 border-b border-heritage-900/50">{st.name} ({st.code})</li>
                             ))
                           ) : (
-                            <li className="px-5 py-3 text-slate-500 italic">Awaiting API connection...</li>
+                            <li className="px-5 py-3 text-slate-500 italic">No stations found</li>
                           )}
                         </motion.ul>
                       )}
@@ -149,10 +184,10 @@ const Dashboard = () => {
 
                 <div>
                   <label className="block text-slate-300 font-semibold tracking-wide mb-2">JOURNEY DATE</label>
-                  <input type="date" className="w-full px-5 py-4 rounded-xl bg-heritage-900 border border-heritage-900 text-slate-100 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 [&::-webkit-calendar-picker-indicator]:invert" />
+                  <input type="date" value={journeyDate} onChange={(e) => setJourneyDate(e.target.value)} className="w-full px-5 py-4 rounded-xl bg-heritage-900 border border-heritage-900 text-slate-100 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 [&::-webkit-calendar-picker-indicator]:invert" />
                 </div>
                 
-                <motion.button type="button" onClick={() => navigate('/results')} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full py-4 rounded-xl bg-orange-600 text-slate-100 font-brand text-2xl tracking-widest shadow-lg shadow-orange-950/40 hover:shadow-orange-950/70 transition-shadow duration-300 mt-4">
+                <motion.button type="button" onClick={handleRouteSearch} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full py-4 rounded-xl bg-orange-600 text-slate-100 font-brand text-2xl tracking-widest shadow-lg shadow-orange-950/40 hover:shadow-orange-950/70 transition-shadow duration-300 mt-4">
                   SEARCH TRAINS
                 </motion.button>
               </form>
@@ -168,8 +203,9 @@ const Dashboard = () => {
                     value={trainQuery}
                     onChange={(e) => {
                       setTrainQuery(e.target.value);
+                      setTrainNumberSelected('');
                       setShowTrainDropdown(true);
-                      searchAPI('trains/search', e.target.value, setTrainSuggestions);
+                      searchAPI('trains', e.target.value, setTrainSuggestions);
                     }}
                     onFocus={() => setShowTrainDropdown(true)}
                     onBlur={() => setTimeout(() => setShowTrainDropdown(false), 200)}
@@ -181,18 +217,18 @@ const Dashboard = () => {
                     {showTrainDropdown && trainQuery && (
                       <motion.ul initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }} className="absolute z-20 w-full mt-2 bg-heritage-950 border border-heritage-800 rounded-xl shadow-2xl max-h-48 overflow-y-auto">
                         {trainSuggestions.length > 0 ? (
-                          trainSuggestions.map((tr, i) => (
-                            <li key={i} onClick={() => { setTrainQuery(tr); setShowTrainDropdown(false); }} className="px-5 py-3 hover:bg-heritage-900 cursor-pointer text-slate-200 border-b border-heritage-900/50">{tr}</li>
+                          trainSuggestions.map((tr) => (
+                            <li key={tr.id} onClick={() => { setTrainQuery(`${tr.name} (${tr.trainNumber})`); setTrainNumberSelected(tr.trainNumber); setShowTrainDropdown(false); }} className="px-5 py-3 hover:bg-heritage-900 cursor-pointer text-slate-200 border-b border-heritage-900/50">{tr.name} ({tr.trainNumber})</li>
                           ))
                         ) : (
-                          <li className="px-5 py-3 text-slate-500 italic">Awaiting API connection...</li>
+                          <li className="px-5 py-3 text-slate-500 italic">No trains found</li>
                         )}
                       </motion.ul>
                     )}
                   </AnimatePresence>
                 </div>
 
-                <motion.button type="button" onClick={() => navigate('/train-status')} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full py-4 rounded-xl bg-orange-600 text-slate-100 font-brand text-2xl tracking-widest shadow-lg shadow-orange-950/40 hover:shadow-orange-950/70 transition-shadow mt-4">
+                <motion.button type="button" onClick={handleTrainLocate} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full py-4 rounded-xl bg-orange-600 text-slate-100 font-brand text-2xl tracking-widest shadow-lg shadow-orange-950/40 hover:shadow-orange-950/70 transition-shadow mt-4">
                   LOCATE TRAIN
                 </motion.button>
               </form>
@@ -208,8 +244,9 @@ const Dashboard = () => {
                     value={stationQuery}
                     onChange={(e) => {
                       setStationQuery(e.target.value);
+                      setStationCodeSelected('');
                       setShowStationDropdown(true);
-                      searchAPI('stations/search', e.target.value, setStationSuggestions);
+                      searchAPI('stations', e.target.value, setStationSuggestions);
                     }}
                     onFocus={() => setShowStationDropdown(true)}
                     onBlur={() => setTimeout(() => setShowStationDropdown(false), 200)}
@@ -221,18 +258,18 @@ const Dashboard = () => {
                     {showStationDropdown && stationQuery && (
                       <motion.ul initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }} className="absolute z-20 w-full mt-2 bg-heritage-950 border border-heritage-800 rounded-xl shadow-2xl max-h-48 overflow-y-auto">
                         {stationSuggestions.length > 0 ? (
-                          stationSuggestions.map((st, i) => (
-                            <li key={i} onClick={() => { setStationQuery(st); setShowStationDropdown(false); }} className="px-5 py-3 hover:bg-heritage-900 cursor-pointer text-slate-200 border-b border-heritage-900/50">{st}</li>
+                          stationSuggestions.map((st) => (
+                            <li key={st.id} onClick={() => { setStationQuery(`${st.name} (${st.code})`); setStationCodeSelected(st.code); setShowStationDropdown(false); }} className="px-5 py-3 hover:bg-heritage-900 cursor-pointer text-slate-200 border-b border-heritage-900/50">{st.name} ({st.code})</li>
                           ))
                         ) : (
-                          <li className="px-5 py-3 text-slate-500 italic">Awaiting API connection...</li>
+                          <li className="px-5 py-3 text-slate-500 italic">No stations found</li>
                         )}
                       </motion.ul>
                     )}
                   </AnimatePresence>
                 </div>
 
-                <motion.button type="button" onClick={() => navigate('/station-board')} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full py-4 rounded-xl bg-orange-600 text-slate-100 font-brand text-2xl tracking-widest shadow-lg shadow-orange-950/40 hover:shadow-orange-950/70 transition-shadow mt-4">
+                <motion.button type="button" onClick={handleStationView} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full py-4 rounded-xl bg-orange-600 text-slate-100 font-brand text-2xl tracking-widest shadow-lg shadow-orange-950/40 hover:shadow-orange-950/70 transition-shadow mt-4">
                   VIEW STATION BOARD
                 </motion.button>
               </form>
@@ -284,6 +321,14 @@ const Dashboard = () => {
               <span className="text-3xl mb-2">🪪</span>
               <span className="text-slate-200 font-bold tracking-wide text-sm">MY PROFILE</span>
             </motion.div>
+
+            {/* ADMIN CONTROL — only visible to admins */}
+            {user?.role === 'ADMIN' && (
+              <motion.div whileHover={{ scale: 1.05 }} onClick={() => navigate('/admin')} className="bg-heritage-950 p-6 rounded-xl border border-orange-900 hover:border-orange-500 transition-colors cursor-pointer flex flex-col items-center justify-center text-center shadow-lg">
+                <span className="text-3xl mb-2">🛠️</span>
+                <span className="text-orange-500 font-bold tracking-wide text-sm">ADMIN CONTROL</span>
+              </motion.div>
+            )}
           </div>
         </div>
         

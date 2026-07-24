@@ -2,6 +2,7 @@ import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext'; 
+import { API_BASE_URL } from '../config/api';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -17,24 +18,40 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(''); 
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const { login } = useContext(AuthContext); 
   const navigate = useNavigate(); 
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    
-    if (email === 'fail') {
-      setError('Invalid credentials. Please verify your access codes.');
-      return;
-    }
+    setError('');
+    setIsSubmitting(true);
 
-    setError(''); 
-    const mockUserData = { id: 1, name: 'Passenger', email: email };
-    const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
-    
-    login(mockUserData, mockToken); 
-    navigate('/dashboard'); 
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/users/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Backend sends { error: "..." } on 401/404/etc.
+        setError(data.error || 'Login failed. Please try again.');
+        return;
+      }
+
+      login(data.user, data.token);
+      navigate('/dashboard');
+
+    } catch (err) {
+      console.error('Login request failed:', err);
+      setError('Could not reach the server. Is the backend running?');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -95,8 +112,8 @@ const Login = () => {
             </motion.div>
 
             <motion.div variants={itemVariants}>
-              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} type="submit" className="w-full py-4 rounded-xl bg-orange-600 text-slate-100 font-brand text-2xl tracking-widest shadow-lg shadow-orange-950/40 hover:shadow-orange-950/70 transition-shadow duration-300">
-                LOGIN
+              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} type="submit" disabled={isSubmitting} className="w-full py-4 rounded-xl bg-orange-600 text-slate-100 font-brand text-2xl tracking-widest shadow-lg shadow-orange-950/40 hover:shadow-orange-950/70 transition-shadow duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                {isSubmitting ? 'CONNECTING...' : 'LOGIN'}
               </motion.button>
             </motion.div>
           </form>

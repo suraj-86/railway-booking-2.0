@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Train" ADD COLUMN     "pricePerSeat" DOUBLE PRECISION NOT NULL DEFAULT 0;
