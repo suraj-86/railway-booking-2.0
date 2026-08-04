@@ -24,7 +24,6 @@ const Booking = () => {
   const [error, setError] = useState('');
   const [isBooking, setIsBooking] = useState(false);
 
-  // Not logged in? Booking needs a real user account.
   useEffect(() => {
     if (!user) {
       navigate('/login');
@@ -79,7 +78,7 @@ const Booking = () => {
         return prev.filter((id) => id !== seat.id);
       }
       if (prev.length >= MAX_SEATS) {
-        return prev; // silently ignore past the cap — button below explains the limit
+        return prev;
       }
       return [...prev, seat.id];
     });
@@ -103,8 +102,6 @@ const Booking = () => {
 
       if (!response.ok) {
         setError(data.error || 'Booking failed.');
-        // Someone may have grabbed a seat between us loading the page and
-        // clicking confirm — refresh the seat map so the UI reflects reality.
         const seatsRes = await fetch(`${API_BASE_URL}/api/trains/${trainId}/seats`);
         const seatsData = await seatsRes.json();
         if (seatsRes.ok) {
@@ -137,7 +134,6 @@ const Booking = () => {
     );
   }
 
-  // Group seats by coach for a clean visual layout
   const seatsByCoach = seats.reduce((acc, seat) => {
     if (!acc[seat.coach]) acc[seat.coach] = [];
     acc[seat.coach].push(seat);
