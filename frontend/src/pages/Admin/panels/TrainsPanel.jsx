@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AuthContext } from '../../../context/AuthContext.jsx';
 import { API_BASE_URL } from '../../../config/api.js';
 
-// Added price to the initial empty state
 const emptyForm = {
   trainNumber: '', name: '', sourceId: '', destinationId: '',
   departure: '', arrival: '', totalSeats: 72, price: 500 
