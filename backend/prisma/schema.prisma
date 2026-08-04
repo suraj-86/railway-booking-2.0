@@ -6,12 +6,11 @@ datasource db {
   provider = "postgresql"
 }
 
-// 1. User Table (Handles Authentication & Roles)
 model User {
   id        String   @id @default(uuid())
   name      String
   email     String   @unique
-  password  String   // Will store the secure Bcrypt hash
+  password  String
   role      Role     @default(USER)
   bookings  Booking[]
   createdAt DateTime @default(now())
@@ -22,11 +21,10 @@ enum Role {
   ADMIN
 }
 
-// 2. Station Table (Master list of stations, managed by admins)
 model Station {
   id        String   @id @default(uuid())
-  code      String   @unique // e.g. "NDLS"
-  name      String           // e.g. "New Delhi"
+  code      String   @unique
+  name      String
   city      String
   createdAt DateTime @default(now())
 
@@ -34,7 +32,6 @@ model Station {
   trainsTo   Train[] @relation("DestinationStation")
 }
 
-// 3. Train Table (The Master Schedule)
 model Train {
   id            String    @id @default(uuid())
   trainNumber   String    @unique
@@ -46,18 +43,17 @@ model Train {
   departure     DateTime
   arrival       DateTime
   totalSeats    Int
-  price         Int      @default(500) // <-- ADD THIS LINE
+  price         Int      @default(500)
   seats         Seat[]
   bookings      Booking[]
 }
 
-// 4. Seat Table (For Visual Seat Selection)
 model Seat {
   id         String   @id @default(uuid())
   trainId    String
   train      Train    @relation(fields: [trainId], references: [id], onDelete: Cascade)
-  seatNumber String   // e.g., "A1", "B12"
-  coach      String   // e.g., "S1", "B1"
+  seatNumber String
+  coach      String
   type       SeatType 
   isBooked   Boolean  @default(false)
   bookingId  String?
@@ -70,7 +66,6 @@ enum SeatType {
   MIDDLE
 }
 
-// 5. Booking Table (Links Users, Trains, and Seats)
 model Booking {
   id          String        @id @default(uuid())
   pnr         String        @unique 
