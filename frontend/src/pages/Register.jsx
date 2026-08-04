@@ -36,7 +36,6 @@ const Register = () => {
     setIsSubmitting(true);
 
     try {
-      // Step 1: register the account
       const registerResponse = await fetch(`${API_BASE_URL}/api/users/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -50,8 +49,6 @@ const Register = () => {
         return;
       }
 
-      // Step 2: the register route doesn't return a token, so log in right
-      // after registering to get one and land the user in a signed-in state.
       const loginResponse = await fetch(`${API_BASE_URL}/api/users/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -61,7 +58,6 @@ const Register = () => {
       const loginData = await loginResponse.json();
 
       if (!loginResponse.ok) {
-        // Registration succeeded but auto-login failed — send them to log in manually.
         navigate('/login');
         return;
       }
