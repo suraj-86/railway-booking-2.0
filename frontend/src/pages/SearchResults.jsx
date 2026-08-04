@@ -13,13 +13,11 @@ const itemVariants = {
   visible: { y: 0, opacity: 1, transition: { duration: 0.4 } }
 };
 
-// Formats an ISO timestamp into just "HH:MM" for the depart/arrive display
 const formatTime = (isoString) => {
   const d = new Date(isoString);
   return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
 };
 
-// Turns a millisecond difference into "Xh Ym"
 const formatDuration = (departureISO, arrivalISO) => {
   const diffMs = new Date(arrivalISO) - new Date(departureISO);
   const totalMinutes = Math.round(diffMs / 60000);
