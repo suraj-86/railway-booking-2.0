@@ -38,7 +38,6 @@ const Login = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        // Backend sends { error: "..." } on 401/404/etc.
         setError(data.error || 'Login failed. Please try again.');
         return;
       }
