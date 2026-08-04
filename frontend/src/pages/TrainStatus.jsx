@@ -15,7 +15,7 @@ const TrainStatus = () => {
         const data = await response.json();
         if (response.ok && data.trains?.length > 0) {
           setTrains(data.trains);
-          setSelectedTrain(data.trains[0]); // Default to the first train
+          setSelectedTrain(data.trains[0]);
         }
       } catch (err) {
         console.error("Failed to fetch trains for radar", err);
