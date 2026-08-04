@@ -4,7 +4,7 @@ import { AuthContext } from '../context/AuthContext.jsx';
 import { API_BASE_URL } from '../config/api.js';
 
 const Profile = () => {
-  const { user, token, login } = useContext(AuthContext); // Destructure login to update context
+  const { user, token, login } = useContext(AuthContext); 
   
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(user?.name || '');
@@ -15,7 +15,6 @@ const Profile = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // Fetch initial profile metrics
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
@@ -37,7 +36,6 @@ const Profile = () => {
     if (user && token) fetchProfileData();
   }, [user, token]);
 
-  // Handle saving the updated profile details
   const handleSaveProfile = async () => {
     setIsSaving(true);
     setError('');
@@ -57,7 +55,6 @@ const Profile = () => {
       
       if (!response.ok) throw new Error(data.error || 'Failed to update profile');
       
-      // Update the global AuthContext so the Navbar updates instantly
       login(data.user, token);
       
       setSuccess('Profile updated successfully!');
