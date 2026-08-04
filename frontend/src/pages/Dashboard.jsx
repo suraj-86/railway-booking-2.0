@@ -19,9 +19,8 @@ const Dashboard = () => {
   const [searchType, setSearchType] = useState('route'); 
   const navigate = useNavigate();
 
-  // --- 1. ROUTE SEARCH STATE ---
   const [fromQuery, setFromQuery] = useState('');
-  const [fromCode, setFromCode] = useState(''); // the actual station code we'll search with
+  const [fromCode, setFromCode] = useState('');
   const [showFromDropdown, setShowFromDropdown] = useState(false);
   const [fromSuggestions, setFromSuggestions] = useState([]); 
 
@@ -32,20 +31,16 @@ const Dashboard = () => {
 
   const [journeyDate, setJourneyDate] = useState('');
 
-  // --- 2. TRAIN SEARCH STATE ---
   const [trainQuery, setTrainQuery] = useState('');
   const [trainNumberSelected, setTrainNumberSelected] = useState('');
   const [showTrainDropdown, setShowTrainDropdown] = useState(false);
   const [trainSuggestions, setTrainSuggestions] = useState([]);
 
-  // --- 3. STATION SEARCH STATE ---
   const [stationQuery, setStationQuery] = useState('');
   const [stationCodeSelected, setStationCodeSelected] = useState('');
   const [showStationDropdown, setShowStationDropdown] = useState(false);
   const [stationSuggestions, setStationSuggestions] = useState([]);
 
-  // --- REAL BACKEND API HANDLERS ---
-  // type is 'stations' or 'trains' — both endpoints accept a `q` query param
   const searchAPI = async (type, query, setSuggestions) => {
     if (!query) {
       setSuggestions([]);
