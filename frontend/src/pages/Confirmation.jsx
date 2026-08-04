@@ -15,9 +15,6 @@ const Confirmation = () => {
   const location = useLocation();
   const { booking, train } = location.state || {};
 
-  // Someone landed here directly (refresh, bookmark, back button) without
-  // real booking data in hand — there's nothing genuine to show, so bounce
-  // them back rather than displaying stale or fabricated ticket info.
   if (!booking || !train) {
     return <Navigate to="/bookings" replace />;
   }
